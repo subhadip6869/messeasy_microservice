@@ -49,9 +49,12 @@ public class PG {
 	@Column(name = "created", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
 	private LocalDateTime created;
 
+//	@ManyToMany(mappedBy = "pg", cascade = CascadeType.ALL)
+//	private List<User> users;
+
 	@JsonManagedReference
-	@OneToMany(mappedBy = "pg", cascade = CascadeType.ALL)
-	private List<User> users;
+	@OneToMany(mappedBy = "pg", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<UserPG> userPGs;
 
 	@PrePersist
 	protected void onCreate() {
@@ -135,12 +138,20 @@ public class PG {
 		return pgId;
 	}
 
-	public List<User> getUsers() {
-		return users;
+//	public List<User> getUsers() {
+//		return users;
+//	}
+//
+//	public void setUser(List<User> users) {
+//		this.users = users;
+//	}
+
+	public List<UserPG> getUserPGs() {
+		return userPGs;
 	}
 
-	public void setUser(List<User> users) {
-		this.users = users;
+	public void setUserPGs(List<UserPG> userPGs) {
+		this.userPGs = userPGs;
 	}
 
 	@Override

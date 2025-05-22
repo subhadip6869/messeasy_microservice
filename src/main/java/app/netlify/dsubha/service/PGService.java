@@ -1,4 +1,4 @@
-package app.netlify.dsubha.dto;
+package app.netlify.dsubha.service;
 
 import java.net.MalformedURLException;
 import java.util.List;
@@ -50,4 +50,15 @@ public class PGService {
 		}
 		return pgRepository.save(fetchedPg);
 	}
+
+	public PG deletePGById(String pgId) {
+		try {
+			PG pg = this.getPGByID(pgId);
+			pgRepository.delete(pg);
+			return pg;
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
 }

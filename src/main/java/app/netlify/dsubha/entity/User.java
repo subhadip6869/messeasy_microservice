@@ -1,15 +1,17 @@
 package app.netlify.dsubha.entity;
 
-import java.time.LocalDate;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDateTime;
+import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
@@ -29,18 +31,18 @@ public class User {
 	@Column(name = "contactNo", length = 20, nullable = true)
 	private String contactNo;
 
-	@JsonBackReference
-	@ManyToOne
-	@JoinColumn(name = "pg_id", referencedColumnName = "pg_id")
-	private PG pg;
+	@Column(name = "photo_url", nullable = true)
+	private URL photoUrl;
 
-	@Column(name = "joining_date", nullable = true)
-	private LocalDate joiningDate;
+//	@ManyToMany
+//	@JoinTable(name = "user_pg", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "pg_id"))
+//	private List<PG> pg;
 
-	@Column(name = "leaving_date", nullable = true)
-	private LocalDate leavingDate;
+	@JsonManagedReference
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<UserPG> userPGs;
 
-	@Column(name = "created")
+	@Column(name = "created", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
 	private LocalDateTime created;
 
 	@PrePersist
@@ -51,15 +53,14 @@ public class User {
 	public User() {
 	}
 
-	public User(String userId, String name, String email, String contactNo, LocalDate joiningDate,
-			LocalDate leavingDate) {
+	public User(String userId, String name, String email, String contactNo, String photoUrl)
+			throws MalformedURLException {
 		super();
 		this.userId = userId;
 		this.name = name;
 		this.email = email;
 		this.contactNo = contactNo;
-		this.joiningDate = joiningDate;
-		this.leavingDate = leavingDate;
+		this.photoUrl = new URL(photoUrl);
 	}
 
 	public String getUserId() {
@@ -94,28 +95,28 @@ public class User {
 		this.contactNo = contactNo;
 	}
 
-	public PG getPg() {
-		return pg;
+	public URL getPhotoUrl() {
+		return photoUrl;
 	}
 
-	public void setPg(PG pg) {
-		this.pg = pg;
+	public void setPhotoUrl(String photoUrl) throws MalformedURLException {
+		this.photoUrl = new URL(photoUrl);
 	}
 
-	public LocalDate getJoiningDate() {
-		return joiningDate;
+//	public List<PG> getPg() {
+//		return pg;
+//	}
+//
+//	public void setPgs(List<PG> pg) {
+//		this.pg = pg;
+//	}
+
+	public List<UserPG> getUserPGs() {
+		return userPGs;
 	}
 
-	public void setJoiningDate(LocalDate joiningDate) {
-		this.joiningDate = joiningDate;
-	}
-
-	public LocalDate getLeavingDate() {
-		return leavingDate;
-	}
-
-	public void setLeavingDate(LocalDate leavingDate) {
-		this.leavingDate = leavingDate;
+	public void setUserPGs(List<UserPG> userPGs) {
+		this.userPGs = userPGs;
 	}
 
 	public LocalDateTime getCreated() {
@@ -124,7 +125,7 @@ public class User {
 
 	@Override
 	public String toString() {
-		return "Users [userId=" + userId + ", name=" + name + ", email=" + email + ", contactNo=" + contactNo + ", pg="
-				+ pg + ", joiningDate=" + joiningDate + ", leavingDate=" + leavingDate + ", created=" + created + "]";
+		return "Users [userId=" + userId + ", name=" + name + ", email=" + email + ", contactNo=" + contactNo
+				+ ", created=" + created + "]";
 	}
 }
