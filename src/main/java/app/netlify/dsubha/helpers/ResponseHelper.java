@@ -1,19 +1,19 @@
-package app.netlify.dsubha.repository;
+package app.netlify.dsubha.helpers;
 
 import org.springframework.http.HttpStatus;
 
-public class ResponseRepository<T> {
+public class ResponseHelper<T> {
 	private int status;
 	private String message;
 	private T data;
 
-	public ResponseRepository(HttpStatus status, String message, T data) {
+	public ResponseHelper(HttpStatus status, String message, T data) {
 		this.status = status.value();
 		this.message = message;
 		this.data = data;
 	}
 
-	public ResponseRepository(int status, String message, T data) {
+	public ResponseHelper(int status, String message, T data) {
 		this.status = status;
 		this.message = message;
 		this.data = data;

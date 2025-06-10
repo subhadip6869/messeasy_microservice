@@ -3,38 +3,31 @@ package app.netlify.dsubha.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import app.netlify.dsubha.dao.PGAdminRepository;
 import app.netlify.dsubha.dao.PGRepository;
-import app.netlify.dsubha.dao.UserPGRepository;
 import app.netlify.dsubha.dao.UserRepository;
 import app.netlify.dsubha.entity.PG;
+import app.netlify.dsubha.entity.PGAdmin;
 import app.netlify.dsubha.entity.User;
-import app.netlify.dsubha.entity.UserPG;
 
 @Component
-public class UserPGService {
+public class PGAdminService {
 	@Autowired
-	UserRepository userRepository;
+	PGAdminRepository pgAdminRepository;
 
 	@Autowired
 	PGRepository pgRepository;
 
 	@Autowired
-	UserPGRepository userPGRepository;
+	UserRepository userRepository;
 
-	public UserPG assignUserToPg(String userId, String pgId) {
+	public PGAdmin assignPGAdmin(String userId, String pgId) {
 		User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
 		PG pg = pgRepository.findById(pgId).orElseThrow(() -> new RuntimeException("PG not found"));
 
-		UserPG userPG = new UserPG(user, pg);
-		return userPGRepository.save(userPG);
+		PGAdmin admin = new PGAdmin(pg, user);
+		return pgAdminRepository.save(admin);
 	}
 
-	public UserPG removeUserFromPG(String userId, String pgID) {
-		UserPG userPG = userPGRepository.findByPgAndUser(pgID, userId);
-		if (userPG != null) {
-			userPGRepository.delete(userPG);
-		}
-		return userPG;
-	}
 }

@@ -3,6 +3,7 @@ package app.netlify.dsubha.controller;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,11 +13,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import app.netlify.dsubha.entity.User;
 import app.netlify.dsubha.entity.UserPG;
-import app.netlify.dsubha.repository.ResponseRepository;
+import app.netlify.dsubha.helpers.ResponseHelper;
 import app.netlify.dsubha.service.UserPGService;
 import app.netlify.dsubha.service.UserService;
 
@@ -29,58 +31,90 @@ public class UserController {
 	@Autowired
 	UserPGService userPGService;
 
-	@PostMapping("/")
-	public ResponseEntity<ResponseRepository<User>> createUser(@RequestBody User user) {
+	@PostMapping
+	public ResponseEntity<ResponseHelper<User>> createUser(@RequestBody User user) {
 		try {
 			User newUser = userService.createNewUser(user);
-			return ResponseEntity.ok(new ResponseRepository<User>(HttpStatus.OK, "Success", newUser));
+			return ResponseEntity.ok(new ResponseHelper<User>(HttpStatus.OK, "Success", newUser));
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(new ResponseRepository<User>(HttpStatus.BAD_REQUEST, e.getMessage(), null));
+					.body(new ResponseHelper<User>(HttpStatus.BAD_REQUEST, e.getMessage(), null));
 		}
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<ResponseRepository<User>> getUserById(@PathVariable String id) {
+	public ResponseEntity<ResponseHelper<User>> getUserById(@PathVariable String id) {
 		try {
 			User fetchedUser = userService.getUserByID(id);
-			return ResponseEntity.ok(new ResponseRepository<User>(HttpStatus.OK, "Success", fetchedUser));
+			return ResponseEntity.ok(new ResponseHelper<User>(HttpStatus.OK, "Success", fetchedUser));
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(new ResponseRepository<User>(HttpStatus.NOT_FOUND, e.getMessage(), null));
+					.body(new ResponseHelper<User>(HttpStatus.NOT_FOUND, "User not found", null));
 		}
 	}
 
-	@PutMapping("/")
-	public ResponseEntity<ResponseRepository<User>> updateUserData(@RequestBody User user) {
+	@GetMapping
+	public ResponseEntity<ResponseHelper<User>> getUserByEmail(@RequestParam String email) {
+		try {
+			User user = userService.getUserByEmail(email);
+			if (user != null) {
+				return ResponseEntity.ok(new ResponseHelper<User>(HttpStatus.OK, "Success", user));
+			} else {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND)
+						.body(new ResponseHelper<User>(HttpStatus.NOT_FOUND, "User not found", null));
+			}
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ResponseHelper<User>(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), null));
+		}
+	}
+
+	@PutMapping
+	public ResponseEntity<ResponseHelper<User>> updateUserData(@RequestBody User user) {
 		try {
 			User updatedUser = userService.updateUserDetails(user);
-			return ResponseEntity.ok(new ResponseRepository<User>(HttpStatus.OK, "Success", updatedUser));
+			return ResponseEntity.ok(new ResponseHelper<User>(HttpStatus.OK, "Success", updatedUser));
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(new ResponseRepository<User>(HttpStatus.NOT_FOUND, e.getMessage(), null));
+					.body(new ResponseHelper<User>(HttpStatus.NOT_FOUND, e.getMessage(), null));
 		}
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<ResponseRepository<User>> deleteUser(@PathVariable String id) {
+	public ResponseEntity<ResponseHelper<User>> deleteUser(@PathVariable String id) {
 		User delUser = userService.deleteUserByID(id);
 		if (delUser != null) {
-			return ResponseEntity.ok(new ResponseRepository<User>(HttpStatus.OK, "Success", delUser));
+			return ResponseEntity.ok(new ResponseHelper<User>(HttpStatus.OK, "Success", delUser));
 		} else {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(new ResponseRepository<User>(HttpStatus.NOT_FOUND, "User doesn't exist", null));
+					.body(new ResponseHelper<User>(HttpStatus.NOT_FOUND, "User doesn't exist", null));
 		}
 	}
 
 	@PostMapping("/assign-pg")
-	public ResponseEntity<ResponseRepository<UserPG>> assignUserToPG(@RequestBody Map<String, String> request) {
+	public ResponseEntity<ResponseHelper<UserPG>> assignUserToPG(@RequestBody Map<String, String> request) {
 		try {
 			UserPG userPG = userPGService.assignUserToPg(request.get("userId"), request.get("pgId"));
-			return ResponseEntity.ok(new ResponseRepository<>(HttpStatus.OK, "PG assigned to user", userPG));
+			return ResponseEntity.ok(new ResponseHelper<>(HttpStatus.OK, "PG assigned to user", userPG));
+		} catch (DataIntegrityViolationException e) {
+			System.out.println(e);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ResponseHelper<>(HttpStatus.BAD_REQUEST, "User already exist in this PG", null));
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(new ResponseRepository<>(HttpStatus.BAD_REQUEST, e.getMessage(), null));
+					.body(new ResponseHelper<>(HttpStatus.BAD_REQUEST, e.getMessage(), null));
+		}
+	}
+
+	@PostMapping("/remove-pg")
+	public ResponseEntity<ResponseHelper<User>> removeUserFromPG(@RequestBody Map<String, String> request) {
+		UserPG userPG = userPGService.removeUserFromPG(request.get("userId"), request.get("pgId"));
+		if (userPG != null) {
+			return ResponseEntity
+					.ok(new ResponseHelper<User>(HttpStatus.OK, "User Removed Successfully", userPG.getUser()));
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+					new ResponseHelper<User>(HttpStatus.NOT_FOUND, "User doesn't exist for thr entered PG", null));
 		}
 	}
 

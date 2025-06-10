@@ -34,13 +34,13 @@ public class User {
 	@Column(name = "photo_url", nullable = true)
 	private URL photoUrl;
 
-//	@ManyToMany
-//	@JoinTable(name = "user_pg", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "pg_id"))
-//	private List<PG> pg;
-
 	@JsonManagedReference
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<UserPG> userPGs;
+
+	@JsonManagedReference
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<PGAdmin> admins;
 
 	@Column(name = "created", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
 	private LocalDateTime created;
@@ -103,20 +103,20 @@ public class User {
 		this.photoUrl = new URL(photoUrl);
 	}
 
-//	public List<PG> getPg() {
-//		return pg;
-//	}
-//
-//	public void setPgs(List<PG> pg) {
-//		this.pg = pg;
-//	}
-
 	public List<UserPG> getUserPGs() {
 		return userPGs;
 	}
 
 	public void setUserPGs(List<UserPG> userPGs) {
 		this.userPGs = userPGs;
+	}
+
+	public List<PGAdmin> getAdmins() {
+		return admins;
+	}
+
+	public void setAdmins(List<PGAdmin> admins) {
+		this.admins = admins;
 	}
 
 	public LocalDateTime getCreated() {

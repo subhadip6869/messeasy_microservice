@@ -18,6 +18,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
@@ -49,12 +50,13 @@ public class PG {
 	@Column(name = "created", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
 	private LocalDateTime created;
 
-//	@ManyToMany(mappedBy = "pg", cascade = CascadeType.ALL)
-//	private List<User> users;
-
 	@JsonManagedReference
 	@OneToMany(mappedBy = "pg", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<UserPG> userPGs;
+
+	@JsonManagedReference
+	@OneToOne(mappedBy = "pg", cascade = CascadeType.ALL, orphanRemoval = true)
+	private PGAdmin admin;
 
 	@PrePersist
 	protected void onCreate() {
@@ -138,14 +140,6 @@ public class PG {
 		return pgId;
 	}
 
-//	public List<User> getUsers() {
-//		return users;
-//	}
-//
-//	public void setUser(List<User> users) {
-//		this.users = users;
-//	}
-
 	public List<UserPG> getUserPGs() {
 		return userPGs;
 	}
@@ -154,11 +148,19 @@ public class PG {
 		this.userPGs = userPGs;
 	}
 
+	public PGAdmin getAdmin() {
+		return admin;
+	}
+
+	public void setAdmin(PGAdmin admin) {
+		this.admin = admin;
+	}
+
 	@Override
 	public String toString() {
 		return "PGs [pgId=" + pgId + ", pgName=" + pgName + ", address=" + address + ", website=" + website
 				+ ", countryCode=" + countryCode + ", timezone=" + timezone + ", currency=" + currency + ", created="
-				+ created + "]";
+				+ created + ", admin=" + admin.getUser().getUserId() + "]";
 	}
 
 }
