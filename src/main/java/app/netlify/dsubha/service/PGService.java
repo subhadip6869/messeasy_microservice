@@ -28,8 +28,8 @@ public class PGService {
 		return (List<PG>) pgRepository.findAll();
 	}
 
-	public PG updatePGDetails(PG pg) throws MalformedURLException {
-		PG fetchedPg = this.getPGByID(pg.getPgId());
+	public PG updatePGDetails(String pgId, PG pg) throws MalformedURLException {
+		PG fetchedPg = this.getPGByID(pgId);
 		if (pg.getPgName() != null) {
 			fetchedPg.setPgName(pg.getPgName());
 		}

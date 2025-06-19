@@ -60,7 +60,7 @@ public class User {
 		this.name = name;
 		this.email = email;
 		this.contactNo = contactNo;
-		this.photoUrl = new URL(photoUrl);
+		this.photoUrl = photoUrl == null ? null : new URL(photoUrl);
 	}
 
 	public String getUserId() {

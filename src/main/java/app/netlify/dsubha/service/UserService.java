@@ -21,7 +21,7 @@ public class UserService {
 
 	public User getUserByID(String userId) {
 		Optional<User> userOptional = userRepository.findById(userId);
-		return userOptional.get();
+		return userOptional.isEmpty() ? null : userOptional.get();
 	}
 
 	public User getUserByEmail(String email) {
@@ -39,6 +39,9 @@ public class UserService {
 
 	public User updateUserDetails(User user) throws MalformedURLException {
 		User fetchedUser = this.getUserByID(user.getUserId());
+		if (fetchedUser == null) {
+			return null;
+		}
 		if (user.getName() != null) {
 			fetchedUser.setName(user.getName());
 		}

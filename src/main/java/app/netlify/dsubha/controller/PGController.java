@@ -13,14 +13,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import app.netlify.dsubha.entity.PG;
 import app.netlify.dsubha.entity.PGAdmin;
+import app.netlify.dsubha.entity.User;
 import app.netlify.dsubha.helpers.ResponseHelper;
 import app.netlify.dsubha.service.PGAdminService;
 import app.netlify.dsubha.service.PGService;
+import app.netlify.dsubha.service.UserPGService;
+import app.netlify.dsubha.service.UserService;
 
 @RestController
 @RequestMapping("/pg")
@@ -30,12 +34,32 @@ public class PGController {
 	PGService pgService;
 
 	@Autowired
+	UserService userService;
+
+	@Autowired
 	PGAdminService pgAdminService;
 
+	@Autowired
+	UserPGService userPGService;
+
 	@PostMapping
-	public ResponseEntity<ResponseHelper<PG>> addNewPg(@RequestBody PG pg) {
+	public ResponseEntity<ResponseHelper<PG>> addNewPg(@RequestBody Map<String, String> body,
+			@RequestHeader(value = "x-user-id", required = false) String userId) {
 		try {
-			PG newPg = pgService.createNewPg(pg);
+			User user = userService.getUserByID(userId);
+			if (user == null) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND)
+						.body(new ResponseHelper<PG>(HttpStatus.NOT_FOUND, "User not found", null));
+			}
+			PG newPg = pgService.createNewPg(new PG(
+					body.get("pgName"),
+					body.get("address"),
+					body.get("website"),
+					body.get("countryCode"),
+					body.get("timezone"),
+					body.get("currency")));
+			userPGService.assignUserToPg(userId, newPg.getPgId());
+			pgAdminService.assignPGAdmin(userId, newPg.getPgId());
 			return ResponseEntity.status(HttpStatus.OK).body(new ResponseHelper<PG>(HttpStatus.OK, "Success", newPg));
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -67,9 +91,15 @@ public class PGController {
 	}
 
 	@PutMapping
-	public ResponseEntity<ResponseHelper<PG>> updatePGDetaills(@RequestBody PG pg) {
+	public ResponseEntity<ResponseHelper<PG>> updatePGDetaills(@RequestBody Map<String, String> body) {
 		try {
-			PG updated = pgService.updatePGDetails(pg);
+			PG updated = pgService.updatePGDetails(body.get("pgId"), new PG(
+					body.get("pgName"),
+					body.get("address"),
+					body.get("website"),
+					body.get("countryCode"),
+					body.get("timezone"),
+					body.get("currency")));
 			return ResponseEntity.status(HttpStatus.OK).body(new ResponseHelper<PG>(HttpStatus.OK, "Success", updated));
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)

@@ -32,9 +32,14 @@ public class UserController {
 	UserPGService userPGService;
 
 	@PostMapping
-	public ResponseEntity<ResponseHelper<User>> createUser(@RequestBody User user) {
+	public ResponseEntity<ResponseHelper<User>> createUser(@RequestBody Map<String, String> requestBody) {
 		try {
-			User newUser = userService.createNewUser(user);
+			User newUser = userService.createNewUser(new User(
+					requestBody.get("userId"),
+					requestBody.get("name"),
+					requestBody.get("email"),
+					requestBody.get("contactNo"),
+					requestBody.get("photoUrl")));
 			return ResponseEntity.ok(new ResponseHelper<User>(HttpStatus.OK, "Success", newUser));
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -46,10 +51,14 @@ public class UserController {
 	public ResponseEntity<ResponseHelper<User>> getUserById(@PathVariable String id) {
 		try {
 			User fetchedUser = userService.getUserByID(id);
+			if (fetchedUser == null) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND)
+						.body(new ResponseHelper<User>(HttpStatus.NOT_FOUND, "User not found", null));
+			}
 			return ResponseEntity.ok(new ResponseHelper<User>(HttpStatus.OK, "Success", fetchedUser));
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(new ResponseHelper<User>(HttpStatus.NOT_FOUND, "User not found", null));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ResponseHelper<User>(HttpStatus.BAD_REQUEST, e.getMessage(), null));
 		}
 	}
 
@@ -70,9 +79,14 @@ public class UserController {
 	}
 
 	@PutMapping
-	public ResponseEntity<ResponseHelper<User>> updateUserData(@RequestBody User user) {
+	public ResponseEntity<ResponseHelper<User>> updateUserData(@RequestBody Map<String, String> requestBody) {
 		try {
-			User updatedUser = userService.updateUserDetails(user);
+			User updatedUser = userService.updateUserDetails(new User(
+					requestBody.get("userId"),
+					requestBody.get("name"),
+					requestBody.get("email"),
+					requestBody.get("contactNo"),
+					requestBody.get("photoUrl")));
 			return ResponseEntity.ok(new ResponseHelper<User>(HttpStatus.OK, "Success", updatedUser));
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND)

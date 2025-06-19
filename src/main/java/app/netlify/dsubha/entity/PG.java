@@ -71,10 +71,10 @@ public class PG {
 			throws MalformedURLException {
 		this.pgName = pgName;
 		this.address = address;
-		this.website = new URL(website);
+		this.website = website == null ? null : new URL(website);
 		this.countryCode = countryCode;
-		this.timezone = ZoneId.of(timezone);
-		this.currency = Currency.getInstance(currency);
+		this.timezone = timezone == null ? null : ZoneId.of(timezone);
+		this.currency = currency == null ? null : Currency.getInstance(currency);
 	}
 
 	public String getPgName() {
