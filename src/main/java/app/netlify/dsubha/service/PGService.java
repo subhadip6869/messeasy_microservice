@@ -16,12 +16,19 @@ public class PGService {
 	PGRepository pgRepository;
 
 	public PG createNewPg(PG pg) throws MalformedURLException {
-		return pgRepository.save(pg);
+		if (pg.getPgId() != null) {
+			PG extPg = this.getPGByID(pg.getPgId());
+			if (extPg != null) {
+				return extPg;
+			}
+		}
+		PG extPg = pgRepository.save(pg);
+		return extPg;
 	}
 
 	public PG getPGByID(String id) {
 		Optional<PG> pgOptional = pgRepository.findById(id);
-		return pgOptional.get();
+		return pgOptional.orElse(null);
 	}
 
 	public List<PG> getAllPGs() {

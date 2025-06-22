@@ -7,8 +7,10 @@ import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Currency;
 import java.util.IllformedLocaleException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -140,7 +142,19 @@ public class PG {
 		return pgId;
 	}
 
-	public List<UserPG> getUserPGs() {
+	public List<Map<String, Object>> getUserPGs() {
+		if (userPGs == null) {
+			return null;
+		}
+		List<Map<String, Object>> userPGs = this.userPGs.stream().map((e) -> {
+			Map<String, Object> userPG = new LinkedHashMap<>();
+			userPG.put("userId", e.getUser().getUserId());
+			userPG.put("name", e.getUser().getName());
+			userPG.put("email", e.getUser().getEmail());
+			userPG.put("contactNo", e.getUser().getContactNo());
+			userPG.put("photoUrl", e.getUser().getPhotoUrl());
+			return userPG;
+		}).toList();
 		return userPGs;
 	}
 
@@ -148,7 +162,16 @@ public class PG {
 		this.userPGs = userPGs;
 	}
 
-	public PGAdmin getAdmin() {
+	public Map<String, Object> getAdmin() {
+		if (admin == null) {
+			return null;
+		}
+		Map<String, Object> admin = new LinkedHashMap<>();
+		admin.put("userId", this.admin.getUser().getUserId());
+		admin.put("name", this.admin.getUser().getName());
+		admin.put("email", this.admin.getUser().getEmail());
+		admin.put("contactNo", this.admin.getUser().getContactNo());
+		admin.put("photoUrl", this.admin.getUser().getPhotoUrl());
 		return admin;
 	}
 

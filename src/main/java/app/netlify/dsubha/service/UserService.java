@@ -16,7 +16,14 @@ public class UserService {
 	UserRepository userRepository;
 
 	public User createNewUser(User user) {
-		return userRepository.save(user);
+		User extUser = this.getUserByID(user.getUserId());
+		if (extUser != null) {
+			return extUser;
+		}
+		extUser = userRepository.save(user);
+		extUser.setUserPGs(List.of());
+		extUser.setAdmins(List.of());
+		return extUser;
 	}
 
 	public User getUserByID(String userId) {
