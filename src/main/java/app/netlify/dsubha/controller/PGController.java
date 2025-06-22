@@ -71,10 +71,15 @@ public class PGController {
 	public ResponseEntity<ResponseHelper<PG>> fetchPGByID(@PathVariable(required = true) String id) {
 		try {
 			PG pg = pgService.getPGByID(id);
-			return ResponseEntity.status(HttpStatus.OK).body(new ResponseHelper<PG>(HttpStatus.OK, "Success", pg));
+			if (pg != null) {
+				return ResponseEntity.status(HttpStatus.OK).body(new ResponseHelper<PG>(HttpStatus.OK, "Success", pg));
+			} else {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND)
+						.body(new ResponseHelper<PG>(HttpStatus.NOT_FOUND, "PG not found", null));
+			}
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(new ResponseHelper<PG>(HttpStatus.NOT_FOUND, e.getMessage(), null));
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(new ResponseHelper<PG>(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), null));
 		}
 	}
 

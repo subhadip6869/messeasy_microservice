@@ -3,7 +3,9 @@ package app.netlify.dsubha.entity;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -103,7 +105,19 @@ public class User {
 		this.photoUrl = new URL(photoUrl);
 	}
 
-	public List<UserPG> getUserPGs() {
+	public List<Map<String, Object>> getUserPGs() {
+		if (userPGs == null)
+			return null;
+
+		List<Map<String, Object>> userPGs = this.userPGs.stream().map((e) -> {
+			Map<String, Object> userPG = new LinkedHashMap<>();
+			userPG.put("pgId", e.getPg().getPgId());
+			userPG.put("name", e.getPg().getPgName());
+			userPG.put("address", e.getPg().getAddress());
+			userPG.put("website", e.getPg().getWebsite());
+			userPG.put("timezone", e.getPg().getTimezone());
+			return userPG;
+		}).toList();
 		return userPGs;
 	}
 
@@ -111,7 +125,19 @@ public class User {
 		this.userPGs = userPGs;
 	}
 
-	public List<PGAdmin> getAdmins() {
+	public List<Map<String, Object>> getAdmins() {
+		if (admins == null)
+			return null;
+
+		List<Map<String, Object>> admins = this.admins.stream().map((e) -> {
+			Map<String, Object> admin = new LinkedHashMap<>();
+			admin.put("pgId", e.getPg().getPgId());
+			admin.put("name", e.getPg().getPgName());
+			admin.put("address", e.getPg().getAddress());
+			admin.put("website", e.getPg().getWebsite());
+			admin.put("timezone", e.getPg().getTimezone());
+			return admin;
+		}).toList();
 		return admins;
 	}
 
