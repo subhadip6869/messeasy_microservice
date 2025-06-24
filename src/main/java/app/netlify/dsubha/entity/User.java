@@ -112,7 +112,7 @@ public class User {
 		List<Map<String, Object>> userPGs = this.userPGs.stream().map((e) -> {
 			Map<String, Object> userPG = new LinkedHashMap<>();
 			userPG.put("pgId", e.getPg().getPgId());
-			userPG.put("name", e.getPg().getPgName());
+			userPG.put("pgName", e.getPg().getPgName());
 			userPG.put("address", e.getPg().getAddress());
 			userPG.put("website", e.getPg().getWebsite());
 			userPG.put("timezone", e.getPg().getTimezone());
@@ -133,7 +133,7 @@ public class User {
 		List<Map<String, Object>> admins = this.admins.stream().map((e) -> {
 			Map<String, Object> admin = new LinkedHashMap<>();
 			admin.put("pgId", e.getPg().getPgId());
-			admin.put("name", e.getPg().getPgName());
+			admin.put("pgName", e.getPg().getPgName());
 			admin.put("address", e.getPg().getAddress());
 			admin.put("website", e.getPg().getWebsite());
 			admin.put("timezone", e.getPg().getTimezone());
