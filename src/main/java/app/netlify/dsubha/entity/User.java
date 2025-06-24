@@ -117,6 +117,7 @@ public class User {
 			userPG.put("website", e.getPg().getWebsite());
 			userPG.put("countryCode", e.getPg().getCountryCode());
 			userPG.put("timezone", e.getPg().getTimezone());
+			userPG.put("currency", e.getPg().getCurrency());
 			userPG.put("created", e.getPg().getCreated());
 			return userPG;
 		}).toList();
@@ -139,6 +140,7 @@ public class User {
 			admin.put("website", e.getPg().getWebsite());
 			admin.put("countryCode", e.getPg().getCountryCode());
 			admin.put("timezone", e.getPg().getTimezone());
+			admin.put("currency", e.getPg().getCurrency());
 			admin.put("created", e.getPg().getCreated());
 			return admin;
 		}).toList();
