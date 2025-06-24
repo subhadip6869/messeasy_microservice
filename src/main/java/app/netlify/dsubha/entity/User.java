@@ -115,6 +115,7 @@ public class User {
 			userPG.put("pgName", e.getPg().getPgName());
 			userPG.put("address", e.getPg().getAddress());
 			userPG.put("website", e.getPg().getWebsite());
+			userPG.put("countryCode", e.getPg().getCountryCode());
 			userPG.put("timezone", e.getPg().getTimezone());
 			userPG.put("created", e.getPg().getCreated());
 			return userPG;
@@ -136,6 +137,7 @@ public class User {
 			admin.put("pgName", e.getPg().getPgName());
 			admin.put("address", e.getPg().getAddress());
 			admin.put("website", e.getPg().getWebsite());
+			admin.put("countryCode", e.getPg().getCountryCode());
 			admin.put("timezone", e.getPg().getTimezone());
 			admin.put("created", e.getPg().getCreated());
 			return admin;
