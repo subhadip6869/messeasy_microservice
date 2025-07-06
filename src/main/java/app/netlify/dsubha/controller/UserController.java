@@ -3,7 +3,6 @@ package app.netlify.dsubha.controller;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,12 +33,8 @@ public class UserController {
 	@PostMapping
 	public ResponseEntity<ResponseHelper<User>> createUser(@RequestBody Map<String, String> requestBody) {
 		try {
-			User newUser = userService.createNewUser(new User(
-					requestBody.get("userId"),
-					requestBody.get("name"),
-					requestBody.get("email"),
-					requestBody.get("contactNo"),
-					requestBody.get("photoUrl")));
+			User newUser = userService.createNewUser(new User(requestBody.get("userId"), requestBody.get("name"),
+					requestBody.get("email"), requestBody.get("contactNo"), requestBody.get("photoUrl")));
 			return ResponseEntity.ok(new ResponseHelper<User>(HttpStatus.OK, "Success", newUser));
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -81,12 +76,9 @@ public class UserController {
 	@PutMapping
 	public ResponseEntity<ResponseHelper<User>> updateUserData(@RequestBody Map<String, String> requestBody) {
 		try {
-			User updatedUser = userService.updateUserDetails(new User(
-					requestBody.get("userId"),
-					requestBody.get("name"),
-					requestBody.get("email"),
-					requestBody.get("contactNo"),
-					requestBody.get("photoUrl")));
+			User updatedUser = userService
+					.updateUserDetails(new User(requestBody.get("userId"), requestBody.get("name"),
+							requestBody.get("email"), requestBody.get("contactNo"), requestBody.get("photoUrl")));
 			return ResponseEntity.ok(new ResponseHelper<User>(HttpStatus.OK, "Success", updatedUser));
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -105,30 +97,20 @@ public class UserController {
 		}
 	}
 
-	@PostMapping("/assign-pg")
-	public ResponseEntity<ResponseHelper<UserPG>> assignUserToPG(@RequestBody Map<String, String> request) {
+	@PostMapping("/join-pg")
+	public ResponseEntity<ResponseHelper<UserPG>> joinPg(@RequestBody Map<String, String> request) {
 		try {
-			UserPG userPG = userPGService.assignUserToPg(request.get("userId"), request.get("pgId"));
-			return ResponseEntity.ok(new ResponseHelper<>(HttpStatus.OK, "PG assigned to user", userPG));
-		} catch (DataIntegrityViolationException e) {
-			System.out.println(e);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(new ResponseHelper<>(HttpStatus.BAD_REQUEST, "User already exist in this PG", null));
+			UserPG userPG = userPGService.joinUserPG(request.get("userId"), request.get("pgId"));
+			if (userPG != null) {
+				return ResponseEntity.status(HttpStatus.OK)
+						.body(new ResponseHelper<>(HttpStatus.OK, "Success", userPG));
+			} else {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+						new ResponseHelper<>(HttpStatus.NOT_FOUND, "User doesn't exist for thr entered PG", null));
+			}
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body(new ResponseHelper<>(HttpStatus.BAD_REQUEST, e.getMessage(), null));
-		}
-	}
-
-	@PostMapping("/remove-pg")
-	public ResponseEntity<ResponseHelper<User>> removeUserFromPG(@RequestBody Map<String, String> request) {
-		UserPG userPG = userPGService.removeUserFromPG(request.get("userId"), request.get("pgId"));
-		if (userPG != null) {
-			return ResponseEntity
-					.ok(new ResponseHelper<User>(HttpStatus.OK, "User Removed Successfully", userPG.getUser()));
-		} else {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-					new ResponseHelper<User>(HttpStatus.NOT_FOUND, "User doesn't exist for thr entered PG", null));
 		}
 	}
 

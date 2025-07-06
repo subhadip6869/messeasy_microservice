@@ -1,5 +1,6 @@
 package app.netlify.dsubha.entity.embeddable;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -8,6 +9,7 @@ import jakarta.persistence.Embeddable;
 
 @Embeddable
 public class UserPGId implements Serializable {
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	@Column(name = "user_id")
