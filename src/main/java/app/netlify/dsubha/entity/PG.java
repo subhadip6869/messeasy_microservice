@@ -155,6 +155,7 @@ public class PG {
 			userPG.put("photoUrl", e.getUser().getPhotoUrl());
 			userPG.put("created", e.getUser().getCreated());
 			userPG.put("joined", e.getJoiningDate());
+			userPG.put("userJoined", e.isUserJoined());
 			return userPG;
 		}).toList();
 		return userPGs;
