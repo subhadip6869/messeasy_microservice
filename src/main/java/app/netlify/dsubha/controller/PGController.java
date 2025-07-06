@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import app.netlify.dsubha.entity.PG;
 import app.netlify.dsubha.entity.PGAdmin;
 import app.netlify.dsubha.entity.User;
+import app.netlify.dsubha.entity.UserPG;
 import app.netlify.dsubha.helpers.ResponseHelper;
 import app.netlify.dsubha.service.PGAdminService;
 import app.netlify.dsubha.service.PGService;
@@ -51,14 +52,9 @@ public class PGController {
 				return ResponseEntity.status(HttpStatus.NOT_FOUND)
 						.body(new ResponseHelper<PG>(HttpStatus.NOT_FOUND, "User not found", null));
 			}
-			PG newPg = pgService.createNewPg(new PG(
-					body.get("pgName"),
-					body.get("address"),
-					body.get("website"),
-					body.get("countryCode"),
-					body.get("timezone"),
-					body.get("currency")));
-			userPGService.assignUserToPg(userId, newPg.getPgId());
+			PG newPg = pgService.createNewPg(new PG(body.get("pgName"), body.get("address"), body.get("website"),
+					body.get("countryCode"), body.get("timezone"), body.get("currency")));
+			userPGService.assignUserToPg(userId, newPg.getPgId(), userId, true);
 			pgAdminService.assignPGAdmin(userId, newPg.getPgId());
 			return ResponseEntity.status(HttpStatus.OK).body(new ResponseHelper<PG>(HttpStatus.OK, "Success", newPg));
 		} catch (Exception e) {
@@ -98,13 +94,8 @@ public class PGController {
 	@PutMapping
 	public ResponseEntity<ResponseHelper<PG>> updatePGDetaills(@RequestBody Map<String, String> body) {
 		try {
-			PG updated = pgService.updatePGDetails(body.get("pgId"), new PG(
-					body.get("pgName"),
-					body.get("address"),
-					body.get("website"),
-					body.get("countryCode"),
-					body.get("timezone"),
-					body.get("currency")));
+			PG updated = pgService.updatePGDetails(body.get("pgId"), new PG(body.get("pgName"), body.get("address"),
+					body.get("website"), body.get("countryCode"), body.get("timezone"), body.get("currency")));
 			return ResponseEntity.status(HttpStatus.OK).body(new ResponseHelper<PG>(HttpStatus.OK, "Success", updated));
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -134,6 +125,35 @@ public class PGController {
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 					.body(new ResponseHelper<PGAdmin>(HttpStatus.BAD_REQUEST, e.getMessage(), null));
+		}
+	}
+
+	@PostMapping("/assign-pg")
+	public ResponseEntity<ResponseHelper<UserPG>> assignUserToPG(@RequestBody Map<String, String> request,
+			@RequestHeader(value = "x-user-id", required = true) String userId) {
+		try {
+			UserPG userPG = userPGService.assignUserToPg(request.get("userId"), request.get("pgId"), userId, false);
+			return ResponseEntity.ok(new ResponseHelper<>(HttpStatus.OK, "PG assigned to user", userPG));
+		} catch (DataIntegrityViolationException e) {
+			System.out.println(e);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ResponseHelper<>(HttpStatus.BAD_REQUEST, "User already exist in this PG", null));
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body(new ResponseHelper<>(HttpStatus.BAD_REQUEST, e.getMessage(), null));
+		}
+	}
+
+	@PostMapping("/remove-pg")
+	public ResponseEntity<ResponseHelper<User>> removeUserFromPG(@RequestBody Map<String, String> request,
+			@RequestHeader(value = "x-user-id", required = true) String userId) {
+		UserPG userPG = userPGService.removeUserFromPG(request.get("userId"), request.get("pgId"), userId);
+		if (userPG != null) {
+			return ResponseEntity
+					.ok(new ResponseHelper<User>(HttpStatus.OK, "User Removed Successfully", userPG.getUser()));
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+					new ResponseHelper<User>(HttpStatus.NOT_FOUND, "User doesn't exist for thr entered PG", null));
 		}
 	}
 

@@ -36,6 +36,9 @@ public class UserPG {
 	@Column(name = "joining_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
 	private LocalDateTime joiningDate;
 
+	@Column(name = "user_joined")
+	private boolean userJoined;
+
 	@PrePersist
 	protected void onCreate() {
 		this.joiningDate = LocalDateTime.now();
@@ -44,15 +47,17 @@ public class UserPG {
 	public UserPG() {
 	}
 
-	public UserPG(User user, PG pg, LocalDateTime joiningDate) {
+	public UserPG(User user, PG pg, LocalDateTime joiningDate, boolean userJoined) {
 		this.user = user;
 		this.pg = pg;
 		this.joiningDate = joiningDate;
+		this.userJoined = userJoined;
 	}
 
-	public UserPG(User user, PG pg) {
+	public UserPG(User user, PG pg, boolean userJoined) {
 		this.user = user;
 		this.pg = pg;
+		this.userJoined = userJoined;
 	}
 
 	public User getUser() {
@@ -77,5 +82,13 @@ public class UserPG {
 
 	public void setJoiningDate(LocalDateTime joiningDate) {
 		this.joiningDate = joiningDate;
+	}
+
+	public boolean isUserJoined() {
+		return userJoined;
+	}
+
+	public void setUserJoined(boolean userJoined) {
+		this.userJoined = userJoined;
 	}
 }
