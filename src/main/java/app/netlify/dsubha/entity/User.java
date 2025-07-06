@@ -106,8 +106,9 @@ public class User {
 	}
 
 	public List<Map<String, Object>> getUserPGs() {
-		if (userPGs == null)
+		if (userPGs == null) {
 			return null;
+		}
 
 		List<Map<String, Object>> userPGs = this.userPGs.stream().map((e) -> {
 			Map<String, Object> userPG = new LinkedHashMap<>();
@@ -119,6 +120,7 @@ public class User {
 			userPG.put("timezone", e.getPg().getTimezone());
 			userPG.put("currency", e.getPg().getCurrency());
 			userPG.put("created", e.getPg().getCreated());
+			userPG.put("joined", e.getJoiningDate());
 			return userPG;
 		}).toList();
 		return userPGs;
@@ -129,8 +131,9 @@ public class User {
 	}
 
 	public List<Map<String, Object>> getAdmins() {
-		if (admins == null)
+		if (admins == null) {
 			return null;
+		}
 
 		List<Map<String, Object>> admins = this.admins.stream().map((e) -> {
 			Map<String, Object> admin = new LinkedHashMap<>();
