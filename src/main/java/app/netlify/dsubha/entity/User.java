@@ -121,6 +121,7 @@ public class User {
 			userPG.put("currency", e.getPg().getCurrency());
 			userPG.put("created", e.getPg().getCreated());
 			userPG.put("joined", e.getJoiningDate());
+			userPG.put("userJoined", e.isUserJoined());
 			return userPG;
 		}).toList();
 		return userPGs;
